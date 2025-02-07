@@ -14,11 +14,21 @@
   --brand-primary-dark: #ffae17;
 }
 
+* {
+  list-style: none;
+  text-decoration: none;
+}
+
+a:hover {
+  text-decoration: underline;
+}
+
 #root {
   min-width: 100vw;
   min-height: 100vh;
   display: flex;
   flex-direction: column;
+
 }
 
 body {

@@ -1,8 +1,13 @@
+import { Link } from "react-router-dom";
+
 const Home = () => {
   return (
     <div className="page home-page">
       <h1>Welcome to Adopt-A-Dog!</h1>
-      <p>To start your adoption journey, login here.</p>
+      <p>To start your adoption journey, login here:</p>
+      <Link to="/login">
+        <button>Log In</button>
+      </Link>
     </div>
   );
 };

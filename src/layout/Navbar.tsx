@@ -5,13 +5,15 @@ const Navbar = () => {
   return (
     <nav className="navbar">
       <div className="navbar-site-info">
-        <img
-          width={96}
-          height={96}
-          src={new URL("./../assets/logo.svg", import.meta.url).href}
-          alt="Site logo"
-        />
-        Adopt-A-Dog
+        <NavLink to="/">
+          <img
+            width={96}
+            height={96}
+            src={new URL("./../assets/logo.svg", import.meta.url).href}
+            alt="Site logo"
+          />
+          Adopt-A-Dog
+        </NavLink>
       </div>
       <menu>
         <li>

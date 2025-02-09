@@ -3,6 +3,7 @@ import dogs from "../../test-data/dogs";
 import DogCard, { DogProps } from "./DogCard";
 
 import "./../../css/DogSearch.css";
+import MultiRangeSlider from "../../components/MultiRangeSlider/MultiRangeSlider";
 
 const DogsSearch = () => {
   const [isOpenFilters, setIsOpenFilters] = useState(false);
@@ -62,26 +63,55 @@ const DogsSearch = () => {
               className="filters-toggle"
               onClick={() => setIsOpenFilters(!isOpenFilters)}
             >
-              Filters
+              Filters (click to toggle open/close)
             </button>
             {isOpenFilters && (
-              <div>
-                <p>(Hold "Shift" to select multiple options)</p>
-                <div className="filters-wrapper">
-                  {filters.map((filter) => (
+              <>
+                <div>
+                  <p>(Hold "Shift" to select multiple options)</p>
+                  <div className="filters-wrapper">
+                    {filters.map((filter, i) => (
+                      <div key={i} className="filter">
+                        {filter.name}
+                        {filter.property !== "age" ? (
+                          <select multiple>
+                            {filter.values.map((value) => (
+                              <option value={value}>{value}</option>
+                            ))}
+                          </select>
+                        ) : (
+                          <MultiRangeSlider
+                            min={0}
+                            max={20}
+                            onChange={({
+                              min,
+                              max,
+                            }: {
+                              min: number;
+                              max: number;
+                            }) => console.log(`min = ${min}, max = ${max}`)}
+                          />
+                        )}
+                      </div>
+                    ))}
                     <div className="filter">
-                      {filter.name}
-                      <select multiple>
-                        {filter.values.map((value) => (
-                          <option value={value}>{value}</option>
+                      Sort By:
+                      <select>
+                        {filters.map((filter) => (
+                          <option>{filter.name}</option>
                         ))}
                       </select>
+                      <p className="note">Direction</p>
+                      <select>
+                        <option value="asc">Asc</option>
+                        <option value="desc">Desc</option>
+                      </select>
                     </div>
-                  ))}
+                  </div>
                 </div>
-              </div>
+                <button>Search</button>
+              </>
             )}
-            <button>Search</button>
           </div>
           <div className="dogs-wrapper">
             {dogs.map((dog) => (

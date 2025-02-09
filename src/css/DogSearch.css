@@ -6,6 +6,12 @@
     margin: 1rem;
 }
 
+.dogs-search-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 2rem;
+}
+
 .filters {
     display: flex;
     flex-direction: column;
@@ -46,4 +52,13 @@
     flex-wrap: wrap;
     justify-content: center;
     gap: 1rem;
+}
+
+.favorite-dogs-header {
+    font-size: 2rem;
+    text-align: center;
+}
+
+.favorite-dogs .dog-card {
+    background-color: var(--brand-primary-semilight);
 }

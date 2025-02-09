@@ -1,11 +1,12 @@
 import { useState } from "react";
 import dogs from "../../test-data/dogs";
-import DogCard from "./DogCard";
+import DogCard, { DogProps } from "./DogCard";
 
 import "./../../css/DogSearch.css";
 
 const DogsSearch = () => {
   const [isOpenFilters, setIsOpenFilters] = useState(false);
+  const [favoriteDogs, setFavoriteDogs] = useState<Array<DogProps>>([]);
 
   interface FilterProps {
     name: string;
@@ -25,6 +26,22 @@ const DogsSearch = () => {
       (filter.values = [...new Set(dogs.map((dog) => dog[filter.property]))])
   );
 
+  const updateFavoriteDogs = (addMode: boolean, dog: DogProps) => {
+    if (addMode) {
+      if (!favoriteDogs.find((favoriteDog) => favoriteDog.id === dog.id)) {
+        setFavoriteDogs(
+          [...favoriteDogs, dog].sort((dog1: DogProps, dog2: DogProps) =>
+            dog1.breed.localeCompare(dog2.breed)
+          )
+        );
+      }
+    } else {
+      setFavoriteDogs(
+        favoriteDogs.filter((favoriteDog) => favoriteDog.id !== dog.id)
+      );
+    }
+  };
+
   return (
     <>
       <h2>Step 1: Search</h2>
@@ -38,48 +55,71 @@ const DogsSearch = () => {
           to be Matched!".
         </p>
       </div>
-      <div className="dogs-search">
-        <div className="filters">
-          <button
-            className="filters-toggle"
-            onClick={() => setIsOpenFilters(!isOpenFilters)}
-          >
-            Filters
-          </button>
-          {isOpenFilters && (
-            <div>
-              <p>(Hold "Shift" to select multiple options)</p>
-              <div className="filters-wrapper">
-                {filters.map((filter) => (
-                  <div className="filter">
-                    {filter.name}
-                    <select multiple>
-                      {filter.values.map((value) => (
-                        <option value={value}>{value}</option>
-                      ))}
-                    </select>
-                  </div>
-                ))}
+      <div className="dogs-search-wrapper">
+        <div className="dogs-search">
+          <div className="filters">
+            <button
+              className="filters-toggle"
+              onClick={() => setIsOpenFilters(!isOpenFilters)}
+            >
+              Filters
+            </button>
+            {isOpenFilters && (
+              <div>
+                <p>(Hold "Shift" to select multiple options)</p>
+                <div className="filters-wrapper">
+                  {filters.map((filter) => (
+                    <div className="filter">
+                      {filter.name}
+                      <select multiple>
+                        {filter.values.map((value) => (
+                          <option value={value}>{value}</option>
+                        ))}
+                      </select>
+                    </div>
+                  ))}
+                </div>
               </div>
-            </div>
-          )}
-          <button>Search</button>
+            )}
+            <button>Search</button>
+          </div>
+          <div className="dogs-wrapper">
+            {dogs.map((dog) => (
+              <DogCard
+                key={dog.id}
+                addMode={true}
+                updateFavoriteDogs={updateFavoriteDogs}
+                id={dog.id}
+                name={dog.name}
+                breed={dog.breed}
+                age={dog.age}
+                zip_code={dog.zip_code}
+                img={dog.img}
+              />
+            ))}
+          </div>
         </div>
-        <div className="dogs-wrapper">
-          {dogs.map((dog) => (
-            <DogCard
-              key={dog.id}
-              id={dog.id}
-              name={dog.name}
-              breed={dog.breed}
-              age={dog.age}
-              zip_code={dog.zip_code}
-              img={dog.img}
-            />
-          ))}
-        </div>
-        <div>
-          <h3>Favorites</h3>
+        <div className="favorite-dogs">
+          <h3 className="favorite-dogs-header">Favorites</h3>
+          <div className="dogs-wrapper">
+            {favoriteDogs.length === 0 ? (
+              <p>You do not currently have any favorites selected.</p>
+            ) : (
+              favoriteDogs.map((dog) => (
+                <DogCard
+                  key={dog.id}
+                  addMode={false}
+                  updateFavoriteDogs={updateFavoriteDogs}
+                  id={dog.id}
+                  name={dog.name}
+                  breed={dog.breed}
+                  age={dog.age}
+                  zip_code={dog.zip_code}
+                  img={dog.img}
+                />
+              ))
+            )}
+          </div>
         </div>
       </div>
     </>

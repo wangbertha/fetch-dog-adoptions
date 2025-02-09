@@ -11,6 +11,7 @@
   /* Global Colors */
   --brand-primary: #ffc457;
   --brand-primary-light: #fff7e8;
+  --brand-primary-semilight: #ffdfa2;
   --brand-primary-dark: #ffae17;
   --brand-primary-extradark: #946000;
 }
@@ -44,6 +45,11 @@ p {
   font-size: 0.8rem;
   font-style: italic;
   text-align: center;
+}
+
+.note {
+  text-align: start;
+  margin: 0;
 }
 
 button {

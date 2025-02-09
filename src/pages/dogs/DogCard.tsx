@@ -1,6 +1,6 @@
 import "./../../css/DogCard.css";
 
-interface DogProps {
+export interface DogProps {
   id: string;
   name: string;
   breed: string;
@@ -9,7 +9,21 @@ interface DogProps {
   img: string;
 }
 
-const DogCard = ({ name, breed, age, zip_code, img }: DogProps) => {
+export interface DogCardProps extends DogProps {
+  addMode: boolean;
+  updateFavoriteDogs: (addMode: boolean, dog: DogProps) => void;
+}
+
+const DogCard = ({
+  id,
+  name,
+  breed,
+  age,
+  zip_code,
+  img,
+  addMode,
+  updateFavoriteDogs,
+}: DogCardProps) => {
   return (
     <article className="dog-card">
       <div className="dog-card-left">
@@ -26,7 +40,13 @@ const DogCard = ({ name, breed, age, zip_code, img }: DogProps) => {
       </div>
       <div className="dog-card-right">
         <img width={144} height={144} src={img} alt="Dog" />
-        <button>Add to Favorites</button>
+        <button
+          onClick={() =>
+            updateFavoriteDogs(addMode, { id, name, breed, age, zip_code, img })
+          }
+        >
+          {addMode ? "Add to Favorites" : "Remove from Favorites"}
+        </button>
       </div>
     </article>
   );

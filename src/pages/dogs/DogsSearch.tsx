@@ -8,11 +8,20 @@ import MultiRangeSlider from "../../components/MultiRangeSlider/MultiRangeSlider
 const DogsSearch = () => {
   const [isOpenFilters, setIsOpenFilters] = useState(false);
   const [favoriteDogs, setFavoriteDogs] = useState<Array<DogProps>>([]);
+  const [queries, setQueries] = useState<QueryProps>({ sort: "breed:asc" });
 
   interface FilterProps {
     name: string;
     property: string;
     values?: Array<string>;
+  }
+
+  interface QueryProps {
+    breeds?: Array<string>;
+    zipCodes?: Array<string>;
+    ageMin?: number;
+    ageMax?: number;
+    sort: string;
   }
 
   // Parse available values for each filter category
@@ -26,6 +35,24 @@ const DogsSearch = () => {
     (filter: FilterProps) =>
       (filter.values = [...new Set(dogs.map((dog) => dog[filter.property]))])
   );
+
+  const updateQueries = (property: string, value: string) => {
+    if (property === "ageMin") {
+      setQueries({ ...queries, ageMin: +value });
+    } else if (property === "ageMax") {
+      setQueries({ ...queries, ageMax: +value });
+    } else if (property === "sort") {
+      let [field, direction] = queries.sort.split(":");
+      if (value === "asc" || value === "desc") {
+        direction = value;
+      } else {
+        field = value;
+      }
+      setQueries({ ...queries, sort: [field, direction].join(":") });
+    } else {
+      setQueries({ ...queries, [property]: value.split(",") });
+    }
+  };
 
   const updateFavoriteDogs = (addMode: boolean, dog: DogProps) => {
     if (addMode) {
@@ -74,9 +101,19 @@ const DogsSearch = () => {
                       <div key={i} className="filter">
                         {filter.name}
                         {filter.property !== "age" ? (
-                          <select multiple>
-                            {filter.values.map((value) => (
-                              <option value={value}>{value}</option>
+                          <select
+                            onChange={(e) => {
+                              const values = [...e.target.selectedOptions].map(
+                                (value) => value.value
+                              );
+                              updateQueries(filter.property, values.toString());
+                            }}
+                            multiple
+                          >
+                            {filter.values.map((value, i) => (
+                              <option key={i} value={value}>
+                                {value}
+                              </option>
                             ))}
                           </select>
                         ) : (
@@ -89,20 +126,29 @@ const DogsSearch = () => {
                             }: {
                               min: number;
                               max: number;
-                            }) => console.log(`min = ${min}, max = ${max}`)}
+                            }) => {
+                              updateQueries("ageMin", min.toString());
+                              updateQueries("ageMax", max.toString());
+                            }}
                           />
                         )}
                       </div>
                     ))}
                     <div className="filter">
                       Sort By:
-                      <select>
-                        {filters.map((filter) => (
-                          <option>{filter.name}</option>
+                      <select
+                        onChange={(e) => updateQueries("sort", e.target.value)}
+                      >
+                        {filters.map((filter, i) => (
+                          <option key={i} value={filter.property}>
+                            {filter.name}
+                          </option>
                         ))}
                       </select>
                       <p className="note">Direction</p>
-                      <select>
+                      <select
+                        onChange={(e) => updateQueries("sort", e.target.value)}
+                      >
                         <option value="asc">Asc</option>
                         <option value="desc">Desc</option>
                       </select>

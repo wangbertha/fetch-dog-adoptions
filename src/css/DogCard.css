@@ -1,0 +1,48 @@
+.dog-card {
+    display: flex;
+    padding: 1rem;
+    width: min-content;
+
+    border: 1px solid black;
+    border-radius: 1rem;
+    background-color: var(--brand-primary-dark);
+}
+
+.dog-card-left {
+    display: flex;
+    flex-direction: column;
+    align-items: start;
+    gap: 0.2rem;
+    width: 10rem;
+}
+
+.dog-card-left .dog-name {
+    align-self: center;
+    margin-bottom: 0.3rem;
+
+    font-size: 1.2rem;
+    font-weight: 1000;
+    font-style: italic;
+}
+
+.dog-card-left span {
+    display: inline-block;
+    width: 5rem;
+    text-align: right;
+    font-weight: 600;
+}
+
+.dog-card-right {
+    display: flex;
+    flex-direction: column;
+    gap: 0.4rem;
+}
+
+.dog-card img {
+    border: 1px solid black;
+}
+
+.dog-card button {
+    padding: 0.6rem 0.2rem;
+    font-size: 0.8rem;
+}

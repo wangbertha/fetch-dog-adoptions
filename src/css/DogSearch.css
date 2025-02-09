@@ -1,0 +1,49 @@
+.dogs-search {
+    width: 100%;
+}
+
+.dogs-search-instructions {
+    margin: 1rem;
+}
+
+.filters {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.6rem;
+    border-radius: 1rem;
+    margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    background-color: var(--brand-primary);
+}
+
+.filters-toggle {
+    width: 100%;
+    height: 2rem;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background-color: var(--brand-primary-extradark);
+    color: var(--brand-primary-light);
+}
+
+.filters-wrapper {
+    display: flex;
+    gap: 1rem;
+}
+
+.filter {
+    display: flex;
+    flex-direction: column;
+    width: 6rem;
+}
+
+.filter select {
+    padding: 0.2rem;
+}
+
+.dogs-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    gap: 1rem;
+}

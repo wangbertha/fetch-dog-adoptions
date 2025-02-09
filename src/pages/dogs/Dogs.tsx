@@ -2,7 +2,7 @@ import { Outlet } from "react-router-dom";
 
 const Dogs = () => {
   return (
-    <div>
+    <div className="page">
       <h1>Dog Match Process</h1>
       <Outlet />
     </div>

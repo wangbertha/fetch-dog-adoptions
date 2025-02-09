@@ -12,6 +12,7 @@
   --brand-primary: #ffc457;
   --brand-primary-light: #fff7e8;
   --brand-primary-dark: #ffae17;
+  --brand-primary-extradark: #946000;
 }
 
 * {
@@ -37,9 +38,17 @@ body {
   margin: 0;
 }
 
+p {
+  margin-bottom: 0.2rem;
+  color: var(--brand-primary-extradark);
+  font-size: 0.8rem;
+  font-style: italic;
+  text-align: center;
+}
+
 button {
   border-radius: 2rem;
-  border: 1px solid transparent;
+  border: 1px solid black;
   padding: 0.6em 4em;
   font-size: 1em;
   font-weight: 500;
@@ -49,9 +58,9 @@ button {
   transition: border-color 0.25s;
 }
 button:hover {
-  border-color: #646cff;
+  border-color: var(--brand-primary-extradark);
 }
 button:focus,
 button:focus-visible {
-  outline: 4px auto -webkit-focus-ring-color;
+  outline: 4px auto var(--brand-primary-extradark);
 }

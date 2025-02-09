@@ -32,8 +32,6 @@
 }
 
 .login-page form button {
-    border: 1px solid black;
     margin-top: 1rem;
-
     background-color: var(--brand-primary);
 }

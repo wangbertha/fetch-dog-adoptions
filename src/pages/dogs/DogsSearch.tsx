@@ -154,12 +154,29 @@ const DogsSearch = () => {
     }
   };
 
-  const findMatch = () => {
+  const findMatch = async () => {
     const favoriteDogIds = favoriteDogs.map((dog) => dog.id);
-    const randomIndex = Math.floor(Math.random() * favoriteDogIds.length);
-    const favoriteDogId = favoriteDogIds[randomIndex];
-    const favoriteDogIdURI = encodeURIComponent(JSON.stringify(favoriteDogId));
-    navigate(`/dogs/match?id=${favoriteDogIdURI}`);
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_BASE_URL + "/dogs/match",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(favoriteDogIds),
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+      const favoriteDogId = await response.json();
+      navigate(`/dogs/match?id=${favoriteDogId.match}`);
+    } catch (error) {
+      console.log(error);
+    }
   };
 
   return (

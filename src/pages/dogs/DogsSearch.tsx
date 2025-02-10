@@ -3,7 +3,7 @@ import DogCard, { DogProps } from "./DogCard";
 
 import "./../../css/DogSearch.css";
 import MultiRangeSlider from "../../components/MultiRangeSlider/MultiRangeSlider";
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 
 interface QueryProps {
   breeds?: Array<string>;
@@ -175,6 +175,9 @@ const DogsSearch = () => {
 
   return (
     <>
+      <a href="/dogs/search#favorites" className="anchor-btn">
+        <button>View Favorites</button>
+      </a>
       <h2>Step 1: Search</h2>
       <div className="dogs-search-instructions">
         <p>
@@ -198,7 +201,7 @@ const DogsSearch = () => {
             {isOpenFilters && (
               <>
                 <div>
-                  <p>(Hold "Shift" to select multiple options)</p>
+                  <p>(Hold "Ctrl" or "Shift" to select multiple options)</p>
                   <div className="filters-wrapper">
                     {filters.map((filter, i) => (
                       <div key={i} className="filter">
@@ -278,7 +281,7 @@ const DogsSearch = () => {
                   Note: Zip Code filter options shown are many but not all
                   available zip codes. Try searching first by breed and age.
                 </p>
-                <div>
+                <div className="btn-wrapper">
                   <button onClick={() => fetchDogs()}>Search</button>
                   <button
                     onClick={() => {
@@ -293,6 +296,7 @@ const DogsSearch = () => {
             )}
           </div>
           <div className="dogs-wrapper">
+            {dogs.length === 0 && <p>Dogs loading...</p>}
             {dogs.map((dog) => (
               <DogCard
                 key={dog.id}
@@ -307,7 +311,7 @@ const DogsSearch = () => {
               />
             ))}
           </div>
-          <div className="pagination-navigation">
+          <div className="btn-wrapper">
             {prev && (
               <button onClick={() => fetchDogs("prev")}>Previous</button>
             )}
@@ -315,7 +319,9 @@ const DogsSearch = () => {
           </div>
         </div>
         <div className="favorite-dogs">
-          <h3 className="favorite-dogs-header">Favorites</h3>
+          <h3 id="favorites" className="favorite-dogs-header">
+            Favorites
+          </h3>
           {favoriteDogs.length === 0 ? (
             <p>You do not currently have any favorites selected.</p>
           ) : (

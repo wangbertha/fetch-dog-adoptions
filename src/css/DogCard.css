@@ -26,9 +26,6 @@
 }
 
 .dog-card-left span {
-    display: inline-block;
-    width: 5rem;
-    text-align: right;
     font-weight: 600;
 }
 
@@ -40,6 +37,8 @@
 
 .dog-card img {
     border: 1px solid black;
+    background-color: var(--brand-primary-semilight);
+    object-fit: scale-down;
 }
 
 .dog-card button {

@@ -1,5 +1,6 @@
 .login-wrapper {
     background-color: var(--brand-primary-dark);
+    width: 16rem;
     margin: 3rem;
     padding: 6rem 4rem;
     border-radius: 4rem;

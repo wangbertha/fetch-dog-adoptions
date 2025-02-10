@@ -1,0 +1,16 @@
+.dog-match {
+    flex: 1;
+    width: 24rem;
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    padding-top: 2rem;
+    align-items: center;
+    text-align: center;
+    font-size: 2rem;
+}
+
+.dog-match img {
+    border: 1rem solid var(--brand-primary-extradark);
+    border-radius: 2rem;
+}

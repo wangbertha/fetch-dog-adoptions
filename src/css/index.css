@@ -40,7 +40,7 @@ body {
 }
 
 p {
-  margin-bottom: 0.2rem;
+  margin: 0 2rem 0.2rem 2rem;
   color: var(--brand-primary-extradark);
   font-size: 0.8rem;
   font-style: italic;
@@ -69,4 +69,28 @@ button:hover {
 button:focus,
 button:focus-visible {
   outline: 4px auto var(--brand-primary-extradark);
+}
+
+.anchor-btn {
+  position: fixed;
+  right: 4px;
+  bottom: 4px;
+}
+
+.anchor-btn button {
+  padding: 0.4rem;
+  background-color: var(--brand-primary-extradark);
+  color: white;
+}
+
+.special-text {
+  font-weight: 700;
+  color: var(--brand-primary-dark);
+  background-color: var(--brand-primary-extradark);
+  background-image: linear-gradient(45deg, var(--brand-primary-dark), var(--brand-primary-extradark));
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -moz-background-clip: text;
+  -moz-text-fill-color: transparent;
 }

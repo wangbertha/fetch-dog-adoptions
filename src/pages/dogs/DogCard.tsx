@@ -14,6 +14,10 @@ export interface DogCardProps extends DogProps {
   updateFavoriteDogs: (addMode: boolean, dog: DogProps) => void;
 }
 
+/**
+ * Tile-like card that displays a dog's information;
+ * Button available to add or remove dog to Favorites
+ */
 const DogCard = ({
   id,
   name,

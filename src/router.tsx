@@ -6,11 +6,13 @@ import Dogs from "./pages/dogs/Dogs";
 import DogsMatch from "./pages/dogs/DogsMatch";
 import DogsSearch from "./pages/dogs/DogsSearch";
 import Error from "./pages/error/ErrorPage";
+import ErrorPage from "./pages/error/ErrorPage";
 
 const router = createBrowserRouter([
   {
     path: "/",
     element: <Root />,
+    errorElement: <Error />,
     children: [
       {
         path: "/",
@@ -20,13 +22,23 @@ const router = createBrowserRouter([
       {
         path: "/login",
         element: <Login />,
+        errorElement: <Error />,
       },
       {
         path: "/dogs",
         element: <Dogs />,
+        errorElement: <ErrorPage />,
         children: [
-          { path: "search", element: <DogsSearch /> },
-          { path: "match", element: <DogsMatch /> },
+          {
+            path: "search",
+            element: <DogsSearch />,
+            errorElement: <ErrorPage />,
+          },
+          {
+            path: "match",
+            element: <DogsMatch />,
+            errorElement: <ErrorPage />,
+          },
         ],
       },
     ],

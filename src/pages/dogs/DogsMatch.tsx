@@ -1,15 +1,22 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
+
 import { DogProps } from "./DogCard";
 
 import "../../css/DogMatch.css";
 
+/**
+ * Child component to "Dogs" that displays the matched dog
+ */
 const DogsMatch = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const [dog, setDog] = useState<DogProps | null>(null);
   const id = searchParams.get("id");
   const navigate = useNavigate();
 
+  /**
+   * Fetch dog with the match ID provided in the URL
+   */
   const fetchDog = async () => {
     try {
       const response = await fetch(import.meta.env.VITE_BASE_URL + "/dogs", {

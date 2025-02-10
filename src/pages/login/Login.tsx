@@ -1,7 +1,11 @@
 import { FormEvent, useState } from "react";
-import "./../../css/Login.css";
 import { useNavigate, useSearchParams } from "react-router-dom";
 
+import "./../../css/Login.css";
+
+/**
+ * Login page; If successful, navigates to "/dogs/search" page
+ */
 const Login = () => {
   const [searchParams, setSearchParams] = useSearchParams();
   const redirectParams = searchParams.get("redirect");

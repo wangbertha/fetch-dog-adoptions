@@ -1,5 +1,8 @@
 import { Link } from "react-router-dom";
 
+/**
+ * Home screen at root path
+ */
 const Home = () => {
   return (
     <div className="page home-page">

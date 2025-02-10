@@ -1,9 +1,10 @@
 import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+
 import DogCard, { DogProps } from "./DogCard";
+import MultiRangeSlider from "../../components/MultiRangeSlider/MultiRangeSlider";
 
 import "./../../css/DogSearch.css";
-import MultiRangeSlider from "../../components/MultiRangeSlider/MultiRangeSlider";
-import { Link, useNavigate } from "react-router-dom";
 
 interface QueryProps {
   breeds?: Array<string>;
@@ -13,6 +14,11 @@ interface QueryProps {
   sort: string;
 }
 
+/**
+ * Child component to "Dogs" that displays dogs and favorited dogs;
+ * Includes functionality to add/remove dogs to favorites;
+ * Includes functionality to filter dogs shown
+ */
 const DogsSearch = () => {
   const [dogs, setDogs] = useState<Array<DogProps>>([]);
   const [breeds, setBreeds] = useState<Array<string>>([]);
@@ -25,6 +31,11 @@ const DogsSearch = () => {
 
   const navigate = useNavigate();
 
+  /**
+   * Fetches dogs to display in "DogCard" format
+   * @param type Type of query; "reset" | "prev" | "next";
+   * Ex. if user needs to reset the filters or navigate pagination
+   */
   const fetchDogs = async (type?: string) => {
     try {
       const url = new URL(import.meta.env.VITE_BASE_URL + "/dogs/search");
@@ -75,6 +86,9 @@ const DogsSearch = () => {
     }
   };
 
+  /**
+   * Fetches all breeds of available dogs
+   */
   const fetchBreeds = async () => {
     try {
       const response = await fetch(
@@ -115,6 +129,11 @@ const DogsSearch = () => {
     },
   ];
 
+  /**
+   * Updates stored queries (Does not fetch dogs with updated queries)
+   * @param property Query property
+   * @param value New query value
+   */
   const updateQueries = (property: string, value: string) => {
     if (property === "age") {
       const [min, max] = value.split("/");
@@ -132,6 +151,11 @@ const DogsSearch = () => {
     }
   };
 
+  /**
+   * Adds or removes a dog to/from Favorited Dogs
+   * @param addMode Boolean to determine whether dog is added or removed; true | false
+   * @param dog Object containing dog information
+   */
   const updateFavoriteDogs = (addMode: boolean, dog: DogProps) => {
     if (addMode) {
       if (!favoriteDogs.find((favoriteDog) => favoriteDog.id === dog.id)) {
@@ -148,6 +172,10 @@ const DogsSearch = () => {
     }
   };
 
+  /**
+   * Fetches a dog match based on Favorited Dogs;
+   * If successful, navigate to the "/dogs/match" page with matched dog
+   */
   const findMatch = async () => {
     if (favoriteDogs.length === 0) {
       setMatchError("Select a few favorites in order to find your match.");
@@ -200,6 +228,7 @@ const DogsSearch = () => {
       </div>
       <div className="dogs-search-wrapper">
         <div className="dogs-search">
+          {/* Filters for Dog Search */}
           <div className="filters">
             <button
               className="filters-toggle"
@@ -306,6 +335,7 @@ const DogsSearch = () => {
               </>
             )}
           </div>
+          {/* Display of dogs to browse, displayed in DogCard format */}
           <div className="dogs-wrapper">
             {dogs.length === 0 && <p>Dogs loading...</p>}
             {dogs.map((dog) => (
@@ -322,6 +352,7 @@ const DogsSearch = () => {
               />
             ))}
           </div>
+          {/* Buttons to navigate paginated results */}
           <div className="btn-wrapper">
             {prev && (
               <button onClick={() => fetchDogs("prev")}>Previous</button>
@@ -329,6 +360,7 @@ const DogsSearch = () => {
             {next && <button onClick={() => fetchDogs("next")}>Next</button>}
           </div>
         </div>
+        {/* Display of Favorited Dogs, displayed in DogCard format */}
         <div className="favorite-dogs">
           <h3 id="favorites" className="favorite-dogs-header">
             Favorites

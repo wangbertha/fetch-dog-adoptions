@@ -115,10 +115,9 @@ const DogsSearch = () => {
   ];
 
   const updateQueries = (property: string, value: string) => {
-    if (property === "ageMin") {
-      setQueries({ ...queries, ageMin: +value });
-    } else if (property === "ageMax") {
-      setQueries({ ...queries, ageMax: +value });
+    if (property === "age") {
+      const [min, max] = value.split("/");
+      setQueries({ ...queries, ageMin: +min, ageMax: +max });
     } else if (property === "sort") {
       let [field, direction] = queries.sort.split(":");
       if (value === "asc" || value === "desc") {
@@ -217,8 +216,10 @@ const DogsSearch = () => {
                               min: number;
                               max: number;
                             }) => {
-                              updateQueries("ageMin", min.toString());
-                              updateQueries("ageMax", max.toString());
+                              updateQueries(
+                                "age",
+                                min.toString() + "/" + max.toString()
+                              );
                             }}
                           />
                         ) : filter.property === "breed" ? (

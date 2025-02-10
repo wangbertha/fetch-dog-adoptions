@@ -1,5 +1,7 @@
 import { Link } from "react-router-dom";
 
+import "../../css/Home.css";
+
 /**
  * Home screen at root path
  */

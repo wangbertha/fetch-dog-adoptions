@@ -4,11 +4,14 @@ import DogCard, { DogProps } from "./DogCard";
 
 import "./../../css/DogSearch.css";
 import MultiRangeSlider from "../../components/MultiRangeSlider/MultiRangeSlider";
+import { useNavigate } from "react-router-dom";
 
 const DogsSearch = () => {
   const [isOpenFilters, setIsOpenFilters] = useState(false);
   const [favoriteDogs, setFavoriteDogs] = useState<Array<DogProps>>([]);
   const [queries, setQueries] = useState<QueryProps>({ sort: "breed:asc" });
+
+  const navigate = useNavigate();
 
   interface FilterProps {
     name: string;
@@ -68,6 +71,14 @@ const DogsSearch = () => {
         favoriteDogs.filter((favoriteDog) => favoriteDog.id !== dog.id)
       );
     }
+  };
+
+  const findMatch = () => {
+    const favoriteDogIds = favoriteDogs.map((dog) => dog.id);
+    const randomIndex = Math.floor(Math.random() * favoriteDogIds.length);
+    const favoriteDogId = favoriteDogIds[randomIndex];
+    const favoriteDogIdURI = encodeURIComponent(JSON.stringify(favoriteDogId));
+    navigate(`/dogs/match?id=${favoriteDogIdURI}`);
   };
 
   return (
@@ -177,25 +188,28 @@ const DogsSearch = () => {
         </div>
         <div className="favorite-dogs">
           <h3 className="favorite-dogs-header">Favorites</h3>
-          <div className="dogs-wrapper">
-            {favoriteDogs.length === 0 ? (
-              <p>You do not currently have any favorites selected.</p>
-            ) : (
-              favoriteDogs.map((dog) => (
-                <DogCard
-                  key={dog.id}
-                  addMode={false}
-                  updateFavoriteDogs={updateFavoriteDogs}
-                  id={dog.id}
-                  name={dog.name}
-                  breed={dog.breed}
-                  age={dog.age}
-                  zip_code={dog.zip_code}
-                  img={dog.img}
-                />
-              ))
-            )}
-          </div>
+          {favoriteDogs.length === 0 ? (
+            <p>You do not currently have any favorites selected.</p>
+          ) : (
+            <>
+              <div className="dogs-wrapper">
+                {favoriteDogs.map((dog) => (
+                  <DogCard
+                    key={dog.id}
+                    addMode={false}
+                    updateFavoriteDogs={updateFavoriteDogs}
+                    id={dog.id}
+                    name={dog.name}
+                    breed={dog.breed}
+                    age={dog.age}
+                    zip_code={dog.zip_code}
+                    img={dog.img}
+                  />
+                ))}
+              </div>
+              <button onClick={findMatch}>Find Your Match!</button>
+            </>
+          )}
         </div>
       </div>
     </>

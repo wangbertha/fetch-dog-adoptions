@@ -54,6 +54,13 @@
     gap: 1rem;
 }
 
+.favorite-dogs {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 1rem;
+}
+
 .favorite-dogs-header {
     font-size: 2rem;
     text-align: center;

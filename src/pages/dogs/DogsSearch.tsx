@@ -1,43 +1,124 @@
-import { useState } from "react";
-import dogs from "../../test-data/dogs";
+import { useEffect, useState } from "react";
 import DogCard, { DogProps } from "./DogCard";
 
 import "./../../css/DogSearch.css";
 import MultiRangeSlider from "../../components/MultiRangeSlider/MultiRangeSlider";
 import { useNavigate } from "react-router-dom";
 
+interface QueryProps {
+  breeds?: Array<string>;
+  zipCodes?: Array<string>;
+  ageMin?: number;
+  ageMax?: number;
+  sort: string;
+}
+
 const DogsSearch = () => {
+  const [dogs, setDogs] = useState<Array<DogProps>>([]);
+  const [breeds, setBreeds] = useState<Array<string>>([]);
   const [isOpenFilters, setIsOpenFilters] = useState(false);
   const [favoriteDogs, setFavoriteDogs] = useState<Array<DogProps>>([]);
   const [queries, setQueries] = useState<QueryProps>({ sort: "breed:asc" });
+  const [prev, setPrev] = useState(null);
+  const [next, setNext] = useState(null);
 
   const navigate = useNavigate();
 
-  interface FilterProps {
-    name: string;
-    property: string;
-    values?: Array<string>;
-  }
+  const fetchDogs = async (type?: string) => {
+    try {
+      const url = new URL(import.meta.env.VITE_BASE_URL + "/dogs/search");
+      if (type === "reset") {
+        url.search = new URLSearchParams({ sort: "breed:asc" }).toString();
+      } else if (type === "prev" && prev) {
+        url.search = new URLSearchParams(prev).toString();
+      } else if (type === "next" && next) {
+        url.search = new URLSearchParams(next).toString();
+      } else {
+        url.search = new URLSearchParams(queries).toString();
+      }
 
-  interface QueryProps {
-    breeds?: Array<string>;
-    zipCodes?: Array<string>;
-    ageMin?: number;
-    ageMax?: number;
-    sort: string;
-  }
+      const responseSearch = await fetch(url, {
+        headers: {
+          Accept: "application/json",
+          "Content-Type": "application/json",
+        },
+        credentials: "include",
+      });
+      if (!responseSearch.ok) {
+        throw new Error(`Response status: ${responseSearch.status}`);
+      }
+      const jsonSearch = await responseSearch.json();
+      const ids = jsonSearch.resultIds;
+      setPrev(jsonSearch.prev);
+      setNext(jsonSearch.next);
+
+      const responseDogs = await fetch(
+        import.meta.env.VITE_BASE_URL + "/dogs",
+        {
+          method: "POST",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify(ids),
+          credentials: "include",
+        }
+      );
+      if (!responseDogs.ok) {
+        throw new Error(`Response status: ${responseDogs.status}`);
+      }
+      const jsonDogs = await responseDogs.json();
+      setDogs(jsonDogs);
+    } catch (error) {
+      console.log(error);
+      if (error === 401) {
+        navigate("/login?token=expired");
+      }
+    }
+  };
+
+  const fetchBreeds = async () => {
+    try {
+      const response = await fetch(
+        import.meta.env.VITE_BASE_URL + "/dogs/breeds",
+        {
+          method: "GET",
+          headers: {
+            Accept: "application/json",
+            "Content-Type": "application/json",
+          },
+          credentials: "include",
+        }
+      );
+      if (!response.ok) {
+        throw new Error(`Response status: ${response.status}`);
+      }
+      const json = await response.json();
+      setBreeds(json);
+    } catch (error) {
+      console.log(error);
+      if (error === 401) {
+        navigate("/login?token=expired");
+      }
+    }
+  };
+
+  useEffect(() => {
+    fetchDogs();
+    fetchBreeds();
+  }, []);
 
   // Parse available values for each filter category
   const filters = [
-    { name: "Breed", property: "breed", values: [] },
-    { name: "Age", property: "age", values: [] },
-    { name: "Zip Code", property: "zip_code", values: [] },
+    { name: "Breed", property: "breed", query: "breeds", values: [] },
+    { name: "Age", property: "age", query: "age", values: [] },
+    {
+      name: "Zip Code",
+      property: "zip_code",
+      query: "zipCodes",
+      values: [...new Set(dogs.map((dog) => dog.zip_code))],
+    },
   ];
-
-  filters.forEach(
-    (filter: FilterProps) =>
-      (filter.values = [...new Set(dogs.map((dog) => dog[filter.property]))])
-  );
 
   const updateQueries = (property: string, value: string) => {
     if (property === "ageMin") {
@@ -111,23 +192,7 @@ const DogsSearch = () => {
                     {filters.map((filter, i) => (
                       <div key={i} className="filter">
                         {filter.name}
-                        {filter.property !== "age" ? (
-                          <select
-                            onChange={(e) => {
-                              const values = [...e.target.selectedOptions].map(
-                                (value) => value.value
-                              );
-                              updateQueries(filter.property, values.toString());
-                            }}
-                            multiple
-                          >
-                            {filter.values.map((value, i) => (
-                              <option key={i} value={value}>
-                                {value}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
+                        {filter.property === "age" ? (
                           <MultiRangeSlider
                             min={0}
                             max={20}
@@ -142,6 +207,38 @@ const DogsSearch = () => {
                               updateQueries("ageMax", max.toString());
                             }}
                           />
+                        ) : filter.property === "breed" ? (
+                          <select
+                            onChange={(e) => {
+                              const values = [...e.target.selectedOptions].map(
+                                (value) => value.value
+                              );
+                              updateQueries("breed", values.toString());
+                            }}
+                            multiple
+                          >
+                            {breeds.map((value, i) => (
+                              <option key={i} value={value}>
+                                {value}
+                              </option>
+                            ))}
+                          </select>
+                        ) : (
+                          <select
+                            onChange={(e) => {
+                              const values = [...e.target.selectedOptions].map(
+                                (value) => value.value
+                              );
+                              updateQueries(filter.query, values.toString());
+                            }}
+                            multiple
+                          >
+                            {filter.values.map((value, i) => (
+                              <option key={i} value={value}>
+                                {value}
+                              </option>
+                            ))}
+                          </select>
                         )}
                       </div>
                     ))}
@@ -166,7 +263,21 @@ const DogsSearch = () => {
                     </div>
                   </div>
                 </div>
-                <button>Search</button>
+                <p>
+                  Note: Zip Code filter options shown are many but not all
+                  available zip codes. Try searching first by breed and age.
+                </p>
+                <div>
+                  <button onClick={() => fetchDogs()}>Search</button>
+                  <button
+                    onClick={() => {
+                      setQueries({ sort: "breed:asc" });
+                      fetchDogs("reset");
+                    }}
+                  >
+                    Reset
+                  </button>
+                </div>
               </>
             )}
           </div>
@@ -184,6 +295,12 @@ const DogsSearch = () => {
                 img={dog.img}
               />
             ))}
+          </div>
+          <div className="pagination-navigation">
+            {prev && (
+              <button onClick={() => fetchDogs("prev")}>Previous</button>
+            )}
+            {next && <button onClick={() => fetchDogs("next")}>Next</button>}
           </div>
         </div>
         <div className="favorite-dogs">

@@ -54,6 +54,12 @@
     gap: 1rem;
 }
 
+.pagination-navigation {
+    display: flex;
+    justify-content: center;
+    margin-top: 1rem;
+}
+
 .favorite-dogs {
     display: flex;
     flex-direction: column;
@@ -68,4 +74,15 @@
 
 .favorite-dogs .dog-card {
     background-color: var(--brand-primary-semilight);
+}
+
+@media (min-width: 1120px) {
+    .dogs-search-wrapper {
+        flex-direction: row;
+    }
+
+    .favorite-dogs {
+        width: 360px;
+        margin-right: 1rem;
+    }
 }

@@ -18,7 +18,7 @@ const Navbar = () => {
       if (!response.ok) {
         throw new Error(`Response status: ${response.status}`);
       }
-      navigate("/login");
+      navigate("/login?logout=true");
     } catch (error) {
       console.log(error);
     }

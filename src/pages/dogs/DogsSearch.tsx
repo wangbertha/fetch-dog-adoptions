@@ -70,10 +70,7 @@ const DogsSearch = () => {
       const jsonDogs = await responseDogs.json();
       setDogs(jsonDogs);
     } catch (error) {
-      console.log(error);
-      if (error === 401) {
-        navigate("/login?token=expired");
-      }
+      navigate(`/login?redirect=${error}`);
     }
   };
 
@@ -96,10 +93,7 @@ const DogsSearch = () => {
       const json = await response.json();
       setBreeds(json);
     } catch (error) {
-      console.log(error);
-      if (error === 401) {
-        navigate("/login?token=expired");
-      }
+      navigate(`/login?redirect=${error}`);
     }
   };
 

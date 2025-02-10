@@ -1,11 +1,22 @@
 import { FormEvent, useState } from "react";
 import "./../../css/Login.css";
-import { useNavigate } from "react-router-dom";
+import { useNavigate, useSearchParams } from "react-router-dom";
 
 const Login = () => {
+  const [searchParams, setSearchParams] = useSearchParams();
+  const redirectParams = searchParams.get("redirect");
+  const logoutParams = searchParams.get("logout");
   const [name, setName] = useState<string>("");
   const [email, setEmail] = useState<string>("");
-  const [responseMessage, setResponseMessage] = useState<string>("");
+  const [responseMessage, setResponseMessage] = useState<string>(
+    redirectParams?.substring(redirectParams.length - 3) === "401"
+      ? `Previous page was unauthorized. Please log in to continue. (${redirectParams})`
+      : redirectParams
+      ? "An error occurred on the previous page."
+      : logoutParams
+      ? "You have been successfully logged out."
+      : ""
+  );
 
   const navigate = useNavigate();
 
@@ -30,7 +41,7 @@ const Login = () => {
       }
       navigate("/dogs/search");
     } catch (error) {
-      setResponseMessage(`Login was unsuccessful. ${error}`);
+      setResponseMessage(`Login was unsuccessful. (${error})`);
     }
   };
 
@@ -41,15 +52,25 @@ const Login = () => {
         <div className="login-message">
           <p>Log in with your name and email below.</p>
           <p>No previous account is necessary.</p>
+          <p>Email format: _____@__.__</p>
         </div>
         <form onSubmit={(e) => postLogin(e)}>
           <label>
             <div>Name</div>
-            <input type="text" onChange={(e) => setName(e.target.value)} />
+            <input
+              type="text"
+              onChange={(e) => setName(e.target.value)}
+              required
+            />
           </label>
           <label>
             <div>Email</div>
-            <input type="email" onChange={(e) => setEmail(e.target.value)} />
+            <input
+              type="text"
+              pattern="^[a-zA-Z0-9._%+\-]+@[a-zA-Z0-9.\-]+\.[a-zA-Z]{2,}$"
+              onChange={(e) => setEmail(e.target.value)}
+              required
+            />
           </label>
           <button type="submit">Log In</button>
           <p>{responseMessage}</p>

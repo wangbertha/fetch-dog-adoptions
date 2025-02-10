@@ -5,10 +5,15 @@
     padding: 0 1rem;
 }
 
-.navbar-site-info a {
+.navbar-site-info {
     display: flex;
     align-items: center;
     letter-spacing: -0.2rem;
     font-size: 2rem;
     font-weight: 700;
+}
+
+.navbar li:hover {
+    cursor: pointer;
+    color: var(--brand-primary-extradark)
 }

@@ -21,6 +21,7 @@ const DogsSearch = () => {
   const [queries, setQueries] = useState<QueryProps>({ sort: "breed:asc" });
   const [prev, setPrev] = useState(null);
   const [next, setNext] = useState(null);
+  const [matchError, setMatchError] = useState<string>("");
 
   const navigate = useNavigate();
 
@@ -148,6 +149,10 @@ const DogsSearch = () => {
   };
 
   const findMatch = async () => {
+    if (favoriteDogs.length === 0) {
+      setMatchError("Select a few favorites in order to find your match.");
+      return;
+    }
     const favoriteDogIds = favoriteDogs.map((dog) => dog.id);
     try {
       const response = await fetch(
@@ -166,9 +171,14 @@ const DogsSearch = () => {
         throw new Error(`Response status: ${response.status}`);
       }
       const favoriteDogId = await response.json();
+      if (Object.keys(favoriteDogId).length === 0) {
+        throw new Error(
+          "There was an error selecting your match! Try giving it another shot."
+        );
+      }
       navigate(`/dogs/match?id=${favoriteDogId.match}`);
     } catch (error) {
-      console.log(error);
+      setMatchError(error.message);
     }
   };
 
@@ -343,6 +353,7 @@ const DogsSearch = () => {
                 ))}
               </div>
               <button onClick={findMatch}>Find Your Match!</button>
+              <p>{matchError}</p>
             </>
           )}
         </div>

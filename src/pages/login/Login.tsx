@@ -26,6 +26,7 @@ const Login = () => {
 
   const postLogin = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setSearchParams(searchParams);
 
     try {
       const response = await fetch(

@@ -56,11 +56,12 @@ const DogsSearch = () => {
       } else {
         url += "/dogs/search?";
         const keys = Object.keys(queries);
+        const values = Object.values(queries);
         for (let i = 0; i < keys.length; i++) {
           if (i !== 0) {
             url += "&";
           }
-          const value = queries[keys[i]];
+          const value = values[i];
           if (Array.isArray(value)) {
             for (let j = 0; j < value.length; j++) {
               if (j !== 0) {
@@ -109,10 +110,12 @@ const DogsSearch = () => {
       const jsonDogs = await responseDogs.json();
       setDogs(jsonDogs);
     } catch (error) {
-      if (+error.message.substring(error.length - 3) === 401) {
-        navigate(`/login?redirect=${error}`);
-      } else {
-        setSearchIssue(true);
+      if (error instanceof Error) {
+        if (+error.message.substring(error.message.length - 3) === 401) {
+          navigate(`/login?redirect=${error}`);
+        } else {
+          setSearchIssue(true);
+        }
       }
     }
   };
@@ -197,7 +200,9 @@ const DogsSearch = () => {
       }
       navigate(`/dogs/match?id=${favoriteDogId.match}`);
     } catch (error) {
-      setMatchError(error.message);
+      if (error instanceof Error) {
+        setMatchError(error.message);
+      }
     }
   };
 

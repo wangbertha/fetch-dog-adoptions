@@ -42,6 +42,7 @@ const DogsMatch = () => {
 
   useEffect(() => {
     fetchDog();
+    setSearchParams(searchParams);
   }, []);
 
   return (

@@ -10,4 +10,6 @@ Grow your family with a deserving pup seeking a new home.
 
 3. Install packages: `npm install`
 
-4. Run: `npm run dev`
+4. Create a new file in the root called `.env`. Paste the following into the file: `VITE_BASE_URL="https://frontend-take-home-service.fetch.com"`
+
+5. Run: `npm run dev`

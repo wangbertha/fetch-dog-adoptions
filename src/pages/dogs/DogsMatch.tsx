@@ -47,6 +47,9 @@ const DogsMatch = () => {
 
   return (
     <>
+      <a href="/dogs/search" className="anchor-btn">
+        <button>Back to Search</button>
+      </a>
       <h2>Step 2: Match</h2>
       <div className="dog-match">
         <div>Congratulations!</div>

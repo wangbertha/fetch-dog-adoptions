@@ -4,6 +4,10 @@ import "./../../css/MultiRangeSlider.css";
 interface MultiRangeSliderProps {
   min: number;
   max: number;
+  minVal: number;
+  maxVal: number;
+  setMinVal: (val: number) => void;
+  setMaxVal: (val: number) => void;
   onChange: (values: OnChangeProps) => void;
 }
 
@@ -12,9 +16,15 @@ interface OnChangeProps {
   max: number;
 }
 
-const MultiRangeSlider = ({ min, max, onChange }: MultiRangeSliderProps) => {
-  const [minVal, setMinVal] = useState<number>(min);
-  const [maxVal, setMaxVal] = useState<number>(max);
+const MultiRangeSlider = ({
+  min,
+  max,
+  minVal,
+  maxVal,
+  setMinVal,
+  setMaxVal,
+  onChange,
+}: MultiRangeSliderProps) => {
   const minValRef = useRef<HTMLInputElement>(null);
   const maxValRef = useRef<HTMLInputElement>(null);
   const range = useRef<HTMLDivElement>(null);

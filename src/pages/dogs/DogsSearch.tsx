@@ -25,6 +25,10 @@ const DogsSearch = () => {
   const [isOpenFilters, setIsOpenFilters] = useState(false);
   const [favoriteDogs, setFavoriteDogs] = useState<Array<DogProps>>([]);
   const [queries, setQueries] = useState<QueryProps>({ sort: "breed:asc" });
+  const minValInit = 0;
+  const maxValInit = 20;
+  const [minVal, setMinVal] = useState<number>(minValInit);
+  const [maxVal, setMaxVal] = useState<number>(maxValInit);
   const [prev, setPrev] = useState(null);
   const [next, setNext] = useState(null);
   const [matchError, setMatchError] = useState<string>("");
@@ -33,21 +37,28 @@ const DogsSearch = () => {
 
   /**
    * Fetches dogs to display in "DogCard" format
-   * @param type Type of query; "reset" | "prev" | "next";
+   * @param type Type of query; "prev" | "next";
    * Ex. if user needs to reset the filters or navigate pagination
    */
   const fetchDogs = async (type?: string) => {
     try {
-      const url = new URL(import.meta.env.VITE_BASE_URL + "/dogs/search");
-      if (type === "reset") {
-        url.search = new URLSearchParams({ sort: "breed:asc" }).toString();
-      } else if (type === "prev" && prev) {
-        url.search = new URLSearchParams(prev).toString();
+      let url = import.meta.env.VITE_BASE_URL;
+      if (type === "prev" && prev) {
+        url += prev;
       } else if (type === "next" && next) {
-        url.search = new URLSearchParams(next).toString();
+        url += next;
       } else {
-        url.search = new URLSearchParams(queries).toString();
+        url += "/dogs/search";
+        for (const key in queries) {
+          const value = queries[key];
+          if (Array.isArray(value)) {
+            url += `?${key}=${encodeURIComponent(JSON.stringify(value))}`;
+          } else {
+            url += `?${key}=${value}`;
+          }
+        }
       }
+      console.log(url);
 
       const responseSearch = await fetch(url, {
         headers: {
@@ -119,15 +130,12 @@ const DogsSearch = () => {
 
   // Parse available values for each filter category
   const filters = [
-    { name: "Breed", property: "breed", query: "breeds", values: [] },
-    { name: "Age", property: "age", query: "age", values: [] },
-    {
-      name: "Zip Code",
-      property: "zip_code",
-      query: "zipCodes",
-      values: [...new Set(dogs.map((dog) => dog.zip_code))],
-    },
+    { name: "Breed", property: "breed" },
+    { name: "Age", property: "age" },
+    { name: "Zip Code", property: "zip_code" },
   ];
+
+  const zipCodes = [...new Set(dogs.map((dog) => dog.zip_code))];
 
   /**
    * Updates stored queries (Does not fetch dogs with updated queries)
@@ -135,7 +143,11 @@ const DogsSearch = () => {
    * @param value New query value
    */
   const updateQueries = (property: string, value: string) => {
-    if (property === "age") {
+    if (property === "reset") {
+      setQueries({ sort: "breed:asc" });
+      setMinVal(0);
+      setMaxVal(20);
+    } else if (property === "age") {
       const [min, max] = value.split("/");
       setQueries({ ...queries, ageMin: +min, ageMax: +max });
     } else if (property === "sort") {
@@ -229,8 +241,15 @@ const DogsSearch = () => {
       <div className="dogs-search-wrapper">
         <div className="dogs-search">
           {/* Filters for Dog Search */}
-          <div className="filters">
+          <form
+            className="filters"
+            onSubmit={(e) => {
+              e.preventDefault();
+              fetchDogs();
+            }}
+          >
             <button
+              type="button"
               className="filters-toggle"
               onClick={() => setIsOpenFilters(!isOpenFilters)}
             >
@@ -241,61 +260,65 @@ const DogsSearch = () => {
                 <div>
                   <p>(Hold "Ctrl" or "Shift" to select multiple options)</p>
                   <div className="filters-wrapper">
-                    {filters.map((filter, i) => (
-                      <div key={i} className="filter">
-                        {filter.name}
-                        {filter.property === "age" ? (
-                          <MultiRangeSlider
-                            min={0}
-                            max={20}
-                            onChange={({
-                              min,
-                              max,
-                            }: {
-                              min: number;
-                              max: number;
-                            }) => {
-                              updateQueries(
-                                "age",
-                                min.toString() + "/" + max.toString()
-                              );
-                            }}
-                          />
-                        ) : filter.property === "breed" ? (
-                          <select
-                            onChange={(e) => {
-                              const values = [...e.target.selectedOptions].map(
-                                (value) => value.value
-                              );
-                              updateQueries("breed", values.toString());
-                            }}
-                            multiple
-                          >
-                            {breeds.map((value, i) => (
-                              <option key={i} value={value}>
-                                {value}
-                              </option>
-                            ))}
-                          </select>
-                        ) : (
-                          <select
-                            onChange={(e) => {
-                              const values = [...e.target.selectedOptions].map(
-                                (value) => value.value
-                              );
-                              updateQueries(filter.query, values.toString());
-                            }}
-                            multiple
-                          >
-                            {filter.values.map((value, i) => (
-                              <option key={i} value={value}>
-                                {value}
-                              </option>
-                            ))}
-                          </select>
-                        )}
-                      </div>
-                    ))}
+                    <label className="filter">
+                      Breed
+                      <select
+                        onChange={(e) => {
+                          const values = [...e.target.selectedOptions].map(
+                            (value) => value.value
+                          );
+                          updateQueries("breed", values.toString());
+                        }}
+                        multiple
+                      >
+                        {breeds.map((value, i) => (
+                          <option key={i} value={value}>
+                            {value}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
+                    <label className="filter">
+                      Age
+                      <MultiRangeSlider
+                        min={minValInit}
+                        max={maxValInit}
+                        minVal={minVal}
+                        maxVal={maxVal}
+                        setMinVal={setMinVal}
+                        setMaxVal={setMaxVal}
+                        onChange={({
+                          min,
+                          max,
+                        }: {
+                          min: number;
+                          max: number;
+                        }) => {
+                          updateQueries(
+                            "age",
+                            min.toString() + "/" + max.toString()
+                          );
+                        }}
+                      />
+                    </label>
+                    <label className="filter">
+                      Zip Codes
+                      <select
+                        onChange={(e) => {
+                          const values = [...e.target.selectedOptions].map(
+                            (value) => value.value
+                          );
+                          updateQueries("zipCodes", values.toString());
+                        }}
+                        multiple
+                      >
+                        {zipCodes.map((value, i) => (
+                          <option key={i} value={value}>
+                            {value}
+                          </option>
+                        ))}
+                      </select>
+                    </label>
                     <div className="filter">
                       Sort By:
                       <select
@@ -321,20 +344,19 @@ const DogsSearch = () => {
                   Note: Zip Code filter options shown are many but not all
                   available zip codes. Try searching first by breed and age.
                 </p>
+                {/* Buttons to submit search query */}
                 <div className="btn-wrapper">
-                  <button onClick={() => fetchDogs()}>Search</button>
+                  <button type="submit">Search</button>
                   <button
-                    onClick={() => {
-                      setQueries({ sort: "breed:asc" });
-                      fetchDogs("reset");
-                    }}
+                    type="reset"
+                    onClick={() => updateQueries("reset", "reset")}
                   >
                     Reset
                   </button>
                 </div>
               </>
             )}
-          </div>
+          </form>
           {/* Display of dogs to browse, displayed in DogCard format */}
           <div className="dogs-wrapper">
             {dogs.length === 0 && <p>Dogs loading...</p>}

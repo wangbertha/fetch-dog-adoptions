@@ -8,7 +8,6 @@ import "./../../css/DogSearch.css";
 
 interface QueryProps {
   breeds?: Array<string>;
-  zipCodes?: Array<string>;
   ageMin?: number;
   ageMax?: number;
   sort: string;
@@ -29,6 +28,7 @@ const DogsSearch = () => {
   const maxValInit = 20;
   const [minVal, setMinVal] = useState<number>(minValInit);
   const [maxVal, setMaxVal] = useState<number>(maxValInit);
+  const [totalResults, setTotalResults] = useState<number>(0);
   const [prev, setPrev] = useState(null);
   const [next, setNext] = useState(null);
   const [matchError, setMatchError] = useState<string>("");
@@ -37,28 +37,38 @@ const DogsSearch = () => {
 
   /**
    * Fetches dogs to display in "DogCard" format
-   * @param type Type of query; "prev" | "next";
+   * @param type Type of query; "reset" | "prev" | "next";
    * Ex. if user needs to reset the filters or navigate pagination
    */
   const fetchDogs = async (type?: string) => {
     try {
       let url = import.meta.env.VITE_BASE_URL;
-      if (type === "prev" && prev) {
+      if (type === "reset") {
+        url += "/dogs/search?sort=breed:asc";
+      } else if (type === "prev" && prev) {
         url += prev;
       } else if (type === "next" && next) {
         url += next;
       } else {
-        url += "/dogs/search";
-        for (const key in queries) {
-          const value = queries[key];
+        url += "/dogs/search?";
+        const keys = Object.keys(queries);
+        for (let i = 0; i < keys.length; i++) {
+          if (i !== 0) {
+            url += "&";
+          }
+          const value = queries[keys[i]];
           if (Array.isArray(value)) {
-            url += `?${key}=${encodeURIComponent(JSON.stringify(value))}`;
+            for (let j = 0; j < value.length; j++) {
+              if (j !== 0) {
+                url += "&";
+              }
+              url += keys[i] + "=" + value[j];
+            }
           } else {
-            url += `?${key}=${value}`;
+            url += keys[i] + "=" + value;
           }
         }
       }
-      console.log(url);
 
       const responseSearch = await fetch(url, {
         headers: {
@@ -72,6 +82,7 @@ const DogsSearch = () => {
       }
       const jsonSearch = await responseSearch.json();
       const ids = jsonSearch.resultIds;
+      setTotalResults(jsonSearch.total);
       setPrev(jsonSearch.prev);
       setNext(jsonSearch.next);
 
@@ -132,10 +143,7 @@ const DogsSearch = () => {
   const filters = [
     { name: "Breed", property: "breed" },
     { name: "Age", property: "age" },
-    { name: "Zip Code", property: "zip_code" },
   ];
-
-  const zipCodes = [...new Set(dogs.map((dog) => dog.zip_code))];
 
   /**
    * Updates stored queries (Does not fetch dogs with updated queries)
@@ -147,6 +155,7 @@ const DogsSearch = () => {
       setQueries({ sort: "breed:asc" });
       setMinVal(0);
       setMaxVal(20);
+      fetchDogs("reset");
     } else if (property === "age") {
       const [min, max] = value.split("/");
       setQueries({ ...queries, ageMin: +min, ageMax: +max });
@@ -267,7 +276,7 @@ const DogsSearch = () => {
                           const values = [...e.target.selectedOptions].map(
                             (value) => value.value
                           );
-                          updateQueries("breed", values.toString());
+                          updateQueries("breeds", values.toString());
                         }}
                         multiple
                       >
@@ -301,24 +310,6 @@ const DogsSearch = () => {
                         }}
                       />
                     </label>
-                    <label className="filter">
-                      Zip Codes
-                      <select
-                        onChange={(e) => {
-                          const values = [...e.target.selectedOptions].map(
-                            (value) => value.value
-                          );
-                          updateQueries("zipCodes", values.toString());
-                        }}
-                        multiple
-                      >
-                        {zipCodes.map((value, i) => (
-                          <option key={i} value={value}>
-                            {value}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
                     <div className="filter">
                       Sort By:
                       <select
@@ -340,10 +331,6 @@ const DogsSearch = () => {
                     </div>
                   </div>
                 </div>
-                <p>
-                  Note: Zip Code filter options shown are many but not all
-                  available zip codes. Try searching first by breed and age.
-                </p>
                 {/* Buttons to submit search query */}
                 <div className="btn-wrapper">
                   <button type="submit">Search</button>
@@ -357,9 +344,10 @@ const DogsSearch = () => {
               </>
             )}
           </form>
+          <p>Number of results: {totalResults}</p>
           {/* Display of dogs to browse, displayed in DogCard format */}
           <div className="dogs-wrapper">
-            {dogs.length === 0 && <p>Dogs loading...</p>}
+            {dogs.length === 0 && <p>Dogs are loading...</p>}
             {dogs.map((dog) => (
               <DogCard
                 key={dog.id}

@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import DogCard, { DogProps } from "./DogCard";
+import DogQueryForm from "./DogQueryForm";
 
 import "./../../css/DogSearch.css";
-import DogQueryForm from "./DogQueryForm";
 
 interface QueryProps {
   breeds?: Array<string>;
@@ -28,6 +28,7 @@ const DogsSearch = () => {
   const [isOpenFilters, setIsOpenFilters] = useState(false);
   const [queries, setQueries] = useState<QueryProps>({ sort: "breed:asc" });
   // Search Results
+  const [searchIssue, setSearchIssue] = useState<boolean>(false);
   const [totalResults, setTotalResults] = useState<number>(0);
   const [prev, setPrev] = useState(null);
   const [next, setNext] = useState(null);
@@ -42,6 +43,7 @@ const DogsSearch = () => {
    * Ex. if user needs to reset the filters or navigate pagination
    */
   const fetchDogs = async (type?: string) => {
+    setSearchIssue(false);
     try {
       // Fetch Dog Search: Dog Ids
       let url = import.meta.env.VITE_BASE_URL;
@@ -107,13 +109,13 @@ const DogsSearch = () => {
       const jsonDogs = await responseDogs.json();
       setDogs(jsonDogs);
     } catch (error) {
-      navigate(`/login?redirect=${error}`);
+      if (+error.message.substring(error.length - 3) === 401) {
+        navigate(`/login?redirect=${error}`);
+      } else {
+        setSearchIssue(true);
+      }
     }
   };
-
-  useEffect(() => {
-    fetchDogs();
-  }, []);
 
   /**
    * Updates stored queries (Does not fetch dogs with updated queries)
@@ -199,6 +201,10 @@ const DogsSearch = () => {
     }
   };
 
+  useEffect(() => {
+    fetchDogs();
+  }, []);
+
   return (
     <>
       <a href="/dogs/search#favorites" className="anchor-btn">
@@ -233,6 +239,12 @@ const DogsSearch = () => {
               />
             )}
           </div>
+          {searchIssue && (
+            <p>
+              There was an issue querying your search. Click "Reset", and try
+              reducing the scope of your search.
+            </p>
+          )}
           <p>Number of results: {totalResults}</p>
           {/* Display of dogs to browse, displayed in DogCard format */}
           <div className="dogs-wrapper">

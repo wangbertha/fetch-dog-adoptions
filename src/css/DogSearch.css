@@ -33,24 +33,6 @@
     color: var(--brand-primary-light);
 }
 
-.filters-wrapper {
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: center;
-    margin: 0 1rem;
-    gap: 1rem;
-}
-
-.filter {
-    display: flex;
-    flex-direction: column;
-    width: 6rem;
-}
-
-.filter select {
-    padding: 0.2rem;
-}
-
 .dogs-wrapper {
     display: flex;
     flex-wrap: wrap;
@@ -92,10 +74,6 @@
     .dogs-search-wrapper {
         flex-direction: row;
         margin: 0 1rem;
-    }
-
-    .dogs-search {
-        width: 21.5rem;
     }
 
     .favorite-dogs {

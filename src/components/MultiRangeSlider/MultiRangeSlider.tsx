@@ -1,4 +1,5 @@
-import { ChangeEvent, useCallback, useEffect, useState, useRef } from "react";
+import { ChangeEvent, useCallback, useEffect, useRef } from "react";
+
 import "./../../css/MultiRangeSlider.css";
 
 interface MultiRangeSliderProps {

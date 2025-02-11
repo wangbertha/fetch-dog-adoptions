@@ -5,6 +5,9 @@ const Navbar = () => {
   const navigate = useNavigate();
   const location = useLocation();
 
+  /**
+   * Invalidates auth cookie and navigates to Login page
+   */
   const postLogout = async () => {
     try {
       const response = await fetch(

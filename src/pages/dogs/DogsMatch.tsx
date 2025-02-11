@@ -9,10 +9,12 @@ import "../../css/DogMatch.css";
  * Child component to "Dogs" that displays the matched dog
  */
 const DogsMatch = () => {
-  const [searchParams, setSearchParams] = useSearchParams();
-  const [dog, setDog] = useState<DogProps | null>(null);
-  const id = searchParams.get("id");
   const navigate = useNavigate();
+
+  // Dog Information
+  const [searchParams, setSearchParams] = useSearchParams();
+  const id = searchParams.get("id");
+  const [dog, setDog] = useState<DogProps | null>(null);
 
   /**
    * Fetch dog with the match ID provided in the URL
@@ -47,7 +49,9 @@ const DogsMatch = () => {
       <h2>Step 2: Match</h2>
       <div className="dog-match">
         <div>Congratulations!</div>
-        <p>You have been successfully matched with {dog ? dog.name : "..."}!</p>
+        <p>
+          You have been successfully matched with {dog ? dog.name : "........"}!
+        </p>
         {dog && <img src={dog.img} alt="" />}
         {dog && (
           <div>

@@ -2,9 +2,9 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 
 import DogCard, { DogProps } from "./DogCard";
-import MultiRangeSlider from "../../components/MultiRangeSlider/MultiRangeSlider";
 
 import "./../../css/DogSearch.css";
+import DogQueryForm from "./DogQueryForm";
 
 interface QueryProps {
   breeds?: Array<string>;
@@ -19,21 +19,22 @@ interface QueryProps {
  * Includes functionality to filter dogs shown
  */
 const DogsSearch = () => {
+  const navigate = useNavigate();
+
+  // Fetched Data
   const [dogs, setDogs] = useState<Array<DogProps>>([]);
-  const [breeds, setBreeds] = useState<Array<string>>([]);
+
+  // Filter-Related States
   const [isOpenFilters, setIsOpenFilters] = useState(false);
-  const [favoriteDogs, setFavoriteDogs] = useState<Array<DogProps>>([]);
   const [queries, setQueries] = useState<QueryProps>({ sort: "breed:asc" });
-  const minValInit = 0;
-  const maxValInit = 20;
-  const [minVal, setMinVal] = useState<number>(minValInit);
-  const [maxVal, setMaxVal] = useState<number>(maxValInit);
+  // Search Results
   const [totalResults, setTotalResults] = useState<number>(0);
   const [prev, setPrev] = useState(null);
   const [next, setNext] = useState(null);
-  const [matchError, setMatchError] = useState<string>("");
 
-  const navigate = useNavigate();
+  // Favorited Dogs and Match Error Message
+  const [favoriteDogs, setFavoriteDogs] = useState<Array<DogProps>>([]);
+  const [matchError, setMatchError] = useState<string>("");
 
   /**
    * Fetches dogs to display in "DogCard" format
@@ -42,6 +43,7 @@ const DogsSearch = () => {
    */
   const fetchDogs = async (type?: string) => {
     try {
+      // Fetch Dog Search: Dog Ids
       let url = import.meta.env.VITE_BASE_URL;
       if (type === "reset") {
         url += "/dogs/search?sort=breed:asc";
@@ -70,6 +72,7 @@ const DogsSearch = () => {
         }
       }
 
+      // Fetch Dog information based on Dog Ids
       const responseSearch = await fetch(url, {
         headers: {
           Accept: "application/json",
@@ -108,42 +111,9 @@ const DogsSearch = () => {
     }
   };
 
-  /**
-   * Fetches all breeds of available dogs
-   */
-  const fetchBreeds = async () => {
-    try {
-      const response = await fetch(
-        import.meta.env.VITE_BASE_URL + "/dogs/breeds",
-        {
-          method: "GET",
-          headers: {
-            Accept: "application/json",
-            "Content-Type": "application/json",
-          },
-          credentials: "include",
-        }
-      );
-      if (!response.ok) {
-        throw new Error(`Response status: ${response.status}`);
-      }
-      const json = await response.json();
-      setBreeds(json);
-    } catch (error) {
-      navigate(`/login?redirect=${error}`);
-    }
-  };
-
   useEffect(() => {
     fetchDogs();
-    fetchBreeds();
   }, []);
-
-  // Parse available values for each filter category
-  const filters = [
-    { name: "Breed", property: "breed" },
-    { name: "Age", property: "age" },
-  ];
 
   /**
    * Updates stored queries (Does not fetch dogs with updated queries)
@@ -153,8 +123,6 @@ const DogsSearch = () => {
   const updateQueries = (property: string, value: string) => {
     if (property === "reset") {
       setQueries({ sort: "breed:asc" });
-      setMinVal(0);
-      setMaxVal(20);
       fetchDogs("reset");
     } else if (property === "age") {
       const [min, max] = value.split("/");
@@ -250,13 +218,7 @@ const DogsSearch = () => {
       <div className="dogs-search-wrapper">
         <div className="dogs-search">
           {/* Filters for Dog Search */}
-          <form
-            className="filters"
-            onSubmit={(e) => {
-              e.preventDefault();
-              fetchDogs();
-            }}
-          >
+          <div className="filters">
             <button
               type="button"
               className="filters-toggle"
@@ -265,85 +227,12 @@ const DogsSearch = () => {
               Filters (click to toggle open/close)
             </button>
             {isOpenFilters && (
-              <>
-                <div>
-                  <p>(Hold "Ctrl" or "Shift" to select multiple options)</p>
-                  <div className="filters-wrapper">
-                    <label className="filter">
-                      Breed
-                      <select
-                        onChange={(e) => {
-                          const values = [...e.target.selectedOptions].map(
-                            (value) => value.value
-                          );
-                          updateQueries("breeds", values.toString());
-                        }}
-                        multiple
-                      >
-                        {breeds.map((value, i) => (
-                          <option key={i} value={value}>
-                            {value}
-                          </option>
-                        ))}
-                      </select>
-                    </label>
-                    <label className="filter">
-                      Age
-                      <MultiRangeSlider
-                        min={minValInit}
-                        max={maxValInit}
-                        minVal={minVal}
-                        maxVal={maxVal}
-                        setMinVal={setMinVal}
-                        setMaxVal={setMaxVal}
-                        onChange={({
-                          min,
-                          max,
-                        }: {
-                          min: number;
-                          max: number;
-                        }) => {
-                          updateQueries(
-                            "age",
-                            min.toString() + "/" + max.toString()
-                          );
-                        }}
-                      />
-                    </label>
-                    <div className="filter">
-                      Sort By:
-                      <select
-                        onChange={(e) => updateQueries("sort", e.target.value)}
-                      >
-                        {filters.map((filter, i) => (
-                          <option key={i} value={filter.property}>
-                            {filter.name}
-                          </option>
-                        ))}
-                      </select>
-                      <p className="note">Direction</p>
-                      <select
-                        onChange={(e) => updateQueries("sort", e.target.value)}
-                      >
-                        <option value="asc">Asc</option>
-                        <option value="desc">Desc</option>
-                      </select>
-                    </div>
-                  </div>
-                </div>
-                {/* Buttons to submit search query */}
-                <div className="btn-wrapper">
-                  <button type="submit">Search</button>
-                  <button
-                    type="reset"
-                    onClick={() => updateQueries("reset", "reset")}
-                  >
-                    Reset
-                  </button>
-                </div>
-              </>
+              <DogQueryForm
+                updateQueries={updateQueries}
+                fetchDogs={fetchDogs}
+              />
             )}
-          </form>
+          </div>
           <p>Number of results: {totalResults}</p>
           {/* Display of dogs to browse, displayed in DogCard format */}
           <div className="dogs-wrapper">

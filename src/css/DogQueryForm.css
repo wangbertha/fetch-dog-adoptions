@@ -1,0 +1,17 @@
+.filters-wrapper {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: center;
+    margin: 0 1rem;
+    gap: 1rem;
+}
+
+.filter {
+    display: flex;
+    flex-direction: column;
+    width: 6rem;
+}
+
+.filter select {
+    padding: 0.2rem;
+}
